@@ -22,21 +22,19 @@ class CardMenu extends StatelessWidget {
     );
   }
 
-  Widget _itemMenus(String menu) {
-    return Container(
-      width: 100,
-      child: Card(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              menu,
-              style: TextStyle(color: darkColor),
-              textAlign: TextAlign.center,
+  Container _itemMenus(String menu) => Container(
+        width: 100,
+        child: Card(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                menu,
+                style: TextStyle(color: darkColor),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }

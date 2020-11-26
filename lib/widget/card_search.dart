@@ -29,46 +29,48 @@ class CardSearch extends StatelessWidget {
             ),
           ),
           SizedBox(width: 12),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  restaurant.name ?? "",
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: darkColor,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.location_pin,
-                      color: Colors.black45,
-                      size: 14,
-                    ),
-                    SizedBox(width: 4),
-                    Text(restaurant.city ?? "")
-                  ],
-                ),
-                SizedBox(height: 16),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.star,
-                      color: Colors.black,
-                      size: 14,
-                    ),
-                    SizedBox(width: 4),
-                    Text(restaurant.rating.toString() ?? "")
-                  ],
-                ),
-              ],
-            ),
-          ),
+          _flexBox(),
         ],
       ),
     );
   }
+
+  Flexible _flexBox() => Flexible(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              restaurant.name ?? "",
+              style: TextStyle(
+                fontSize: 18.0,
+                color: darkColor,
+              ),
+            ),
+            SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(
+                  Icons.location_pin,
+                  color: Colors.black45,
+                  size: 14,
+                ),
+                SizedBox(width: 4),
+                Text(restaurant.city ?? "")
+              ],
+            ),
+            SizedBox(height: 16),
+            Row(
+              children: [
+                Icon(
+                  Icons.star,
+                  color: Colors.black,
+                  size: 14,
+                ),
+                SizedBox(width: 4),
+                Text(restaurant.rating.toString() ?? "")
+              ],
+            ),
+          ],
+        ),
+      );
 }

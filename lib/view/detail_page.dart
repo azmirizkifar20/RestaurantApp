@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/api/result_state.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
-import 'package:restaurant_app/utils/providers/restaurant_detail_provider.dart';
 import 'package:restaurant_app/widget/card_category.dart';
 import 'package:restaurant_app/widget/card_menu.dart';
 import 'package:restaurant_app/widget/card_review.dart';
+import 'package:restaurant_app/utils/providers/restaurant_detail_provider.dart';
 
 class DetailPage extends StatefulWidget {
   static const routeName = '/detail_page';

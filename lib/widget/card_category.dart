@@ -22,20 +22,18 @@ class CardCategory extends StatelessWidget {
     );
   }
 
-  Widget _itemMenus(String menu) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Material(
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: Text(
-            menu,
-            style: TextStyle(color: darkColor, fontSize: 18),
-            textAlign: TextAlign.center,
+  Padding _itemMenus(String menu) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Material(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Text(
+              menu,
+              style: TextStyle(color: darkColor, fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }

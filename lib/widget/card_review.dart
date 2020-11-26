@@ -20,30 +20,28 @@ class CardReview extends StatelessWidget {
     );
   }
 
-  Widget _itemReview(CustomerReview review) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              review.name,
-              style: TextStyle(fontSize: 18, color: darkColor),
-            ),
-            SizedBox(height: 2),
-            Text(
-              review.date,
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            SizedBox(height: 8),
-            Text(
-              review.review,
-              style: TextStyle(fontSize: 16, color: darkColor),
-            ),
-          ],
+  Card _itemReview(CustomerReview review) => Card(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                review.name,
+                style: TextStyle(fontSize: 18, color: darkColor),
+              ),
+              SizedBox(height: 2),
+              Text(
+                review.date,
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+              SizedBox(height: 8),
+              Text(
+                review.review,
+                style: TextStyle(fontSize: 16, color: darkColor),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 }
