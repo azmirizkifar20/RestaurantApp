@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:restaurant_app/utils/styles.dart';
 import 'package:restaurant_app/view/detail_page.dart';
 import 'package:restaurant_app/view/list_page.dart';
+import 'package:restaurant_app/view/search_page.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -21,8 +23,9 @@ class MyApp extends StatelessWidget {
       routes: {
         ListPage.routeName: (context) => ListPage(),
         DetailPage.routeName: (context) => DetailPage(
-              restaurant: ModalRoute.of(context).settings.arguments,
-            )
+              id: ModalRoute.of(context).settings.arguments,
+            ),
+        SearchPage.routeName: (context) => SearchPage()
       },
     );
   }
