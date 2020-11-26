@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
-import 'package:restaurant_app/data/model/restaurant_search.dart';
-import 'package:restaurant_app/utils/styles.dart';
+import 'package:restaurant_app/data/api/result_state.dart';
+import 'package:restaurant_app/utils/style/styles.dart';
 import 'package:restaurant_app/view/detail_page.dart';
 import 'package:restaurant_app/widget/card_search.dart';
+import 'package:restaurant_app/utils/providers/restaurant_search_provider.dart';
 
 class SearchPage extends StatefulWidget {
   static const routeName = '/search_page';
@@ -13,13 +15,13 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  Future<RestaurantSearchResult> _restaurant;
-  var _searchEdit = new TextEditingController();
   String _searchText = "";
+  TextEditingController _searchEdit = new TextEditingController();
+  final provider = RestaurantSearchProvider(apiService: ApiService());
 
   @override
   void initState() {
-    _restaurant = ApiService().searchRestaurant(_searchText);
+    provider.fetchSearchRestaurant(_searchText);
     super.initState();
   }
 
@@ -27,36 +29,39 @@ class _SearchPageState extends State<SearchPage> {
     _searchEdit.addListener(() {
       setState(() {
         _searchText = _searchEdit.text;
-        _restaurant = ApiService().searchRestaurant(_searchText);
+        provider.fetchSearchRestaurant(_searchText);
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: toscaColor,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.only(top: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  'Search',
-                  style: TextStyle(
-                    fontSize: 28,
-                    color: primaryColor,
-                    fontFamily: 'Oxygen',
-                    fontWeight: FontWeight.bold,
+    return ChangeNotifierProvider<RestaurantSearchProvider>(
+      create: (_) => provider,
+      child: Scaffold(
+        backgroundColor: toscaColor,
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(top: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Text(
+                    'Search',
+                    style: TextStyle(
+                      fontSize: 28,
+                      color: primaryColor,
+                      fontFamily: 'Oxygen',
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              _searchView(),
-              _boxItem(context)
-            ],
+                _searchView(),
+                _boxItem(context)
+              ],
+            ),
           ),
         ),
       ),
@@ -95,41 +100,48 @@ class _SearchPageState extends State<SearchPage> {
                 topRight: Radius.circular(30.0),
                 topLeft: Radius.circular(30.0)),
           ),
-          child: FutureBuilder(
-            future: _restaurant,
-            builder: (context, AsyncSnapshot<RestaurantSearchResult> snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return Center(child: CircularProgressIndicator());
-              } else {
-                if (snapshot.hasData) {
-                  if (snapshot.data.founded == 0) {
-                    return Center(child: Text("Cari data restaurant"));
-                  } else {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      padding: EdgeInsets.only(top: 8),
-                      itemCount: snapshot.data.founded,
-                      itemBuilder: (context, index) {
-                        var restaurant = snapshot.data.restaurants[index];
-                        return InkWell(
-                          onTap: () => Navigator.pushNamed(
-                            context,
-                            DetailPage.routeName,
-                            arguments: restaurant.id,
-                          ),
-                          child: CardSearch(restaurant: restaurant),
-                        );
-                      },
-                    );
-                  }
-                } else if (snapshot.hasError) {
-                  return Center(child: Text(snapshot.error.toString()));
-                } else {
-                  return Center(child: Text("Data tidak ditemukan"));
-                }
-              }
-            },
-          ),
+          child: _consumer(),
         ),
+      );
+
+  Consumer<RestaurantSearchProvider> _consumer() => Consumer(
+        builder: (context, value, _) {
+          switch (value.state) {
+            case ResultState.Loading:
+              return Center(child: CircularProgressIndicator());
+              break;
+
+            case ResultState.HasData:
+              return ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.only(top: 8),
+                itemCount: value.result.founded,
+                itemBuilder: (context, index) {
+                  var restaurant = value.result.restaurants[index];
+                  return InkWell(
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      DetailPage.routeName,
+                      arguments: restaurant.id,
+                    ),
+                    child: CardSearch(restaurant: restaurant),
+                  );
+                },
+              );
+              break;
+
+            case ResultState.NoData:
+              return Center(child: Text(value.message));
+              break;
+
+            case ResultState.Error:
+              return Center(child: Text(value.message));
+              break;
+
+            default:
+              return Center(child: Text(''));
+              break;
+          }
+        },
       );
 }

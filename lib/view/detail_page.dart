@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
+import 'package:restaurant_app/data/api/result_state.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
+import 'package:restaurant_app/utils/providers/restaurant_detail_provider.dart';
 import 'package:restaurant_app/widget/card_category.dart';
 import 'package:restaurant_app/widget/card_menu.dart';
 import 'package:restaurant_app/widget/card_review.dart';
@@ -17,53 +20,61 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  Future<RestaurantDetailResult> _restaurant;
   static const _imageUrl = 'https://restaurant-api.dicoding.dev/images/medium';
-
-  @override
-  void initState() {
-    _restaurant = ApiService().detailRestaurant(widget.id);
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
-          child: FutureBuilder(
-            future: _restaurant,
-            builder: (context, AsyncSnapshot<RestaurantDetailResult> snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return Container(
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.height,
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              } else {
-                if (snapshot.hasData) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _header(context, snapshot.data.restaurant),
-                      SizedBox(height: 8),
-                      _content(context, snapshot.data.restaurant),
-                    ],
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(child: Text(snapshot.error.toString()));
-                } else {
-                  return Center(child: Text("Data kosong:("));
-                }
-              }
-            },
+          child: ChangeNotifierProvider<RestaurantDetailProvider>(
+            create: (_) => RestaurantDetailProvider(
+                apiService: ApiService(), id: widget.id),
+            child: _consumer(),
           ),
         ),
       ),
     );
   }
+
+  Consumer<RestaurantDetailProvider> _consumer() => Consumer(
+        builder: (context, value, _) {
+          switch (value.state) {
+            case ResultState.Loading:
+              return Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.height,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+              break;
+
+            case ResultState.HasData:
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _header(context, value.result.restaurant),
+                  SizedBox(height: 8),
+                  _content(context, value.result.restaurant),
+                ],
+              );
+              break;
+
+            case ResultState.NoData:
+              return Center(child: Text(value.message));
+              break;
+
+            case ResultState.Error:
+              return Center(child: Text(value.message));
+              break;
+
+            default:
+              return Center(child: Text(''));
+              break;
+          }
+        },
+      );
 
   Stack _header(BuildContext context, Restaurant restaurant) => Stack(
         children: [
