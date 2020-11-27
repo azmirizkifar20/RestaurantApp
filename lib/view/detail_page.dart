@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/api/result_state.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
+import 'package:restaurant_app/utils/style/styles.dart';
 import 'package:restaurant_app/widget/card_category.dart';
 import 'package:restaurant_app/widget/card_menu.dart';
 import 'package:restaurant_app/widget/card_review.dart';
@@ -20,7 +21,20 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final provider = RestaurantDetailProvider(apiService: ApiService());
   static const _imageUrl = 'https://restaurant-api.dicoding.dev/images/medium';
+
+  @override
+  void initState() {
+    provider.fetchDetailRestaurant(widget.id);
+    super.initState();
+  }
+
+  void _addReview(Map data) {
+    provider.addReview(data);
+    provider.fetchDetailRestaurant(widget.id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +42,15 @@ class _DetailPageState extends State<DetailPage> {
       body: SingleChildScrollView(
         child: SafeArea(
           child: ChangeNotifierProvider<RestaurantDetailProvider>(
-            create: (_) => RestaurantDetailProvider(
-                apiService: ApiService(), id: widget.id),
+            create: (_) => provider,
             child: _consumer(),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: "Add review",
+        child: Icon(Icons.edit, color: primaryColor),
+        onPressed: () => showFormDialog(context),
       ),
     );
   }
@@ -215,4 +233,68 @@ class _DetailPageState extends State<DetailPage> {
 
     return children;
   }
+
+  Future<void> showFormDialog(BuildContext context) async => await showDialog(
+      context: context,
+      builder: (context) {
+        final TextEditingController _namaController = TextEditingController();
+        final TextEditingController _reviewController = TextEditingController();
+
+        return AlertDialog(
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Tambah review',
+                  style: TextStyle(fontSize: 20, color: darkColor),
+                ),
+                SizedBox(height: 6),
+                TextFormField(
+                  validator: (value) {
+                    return value.isNotEmpty ? null : "Nama wajib diisi";
+                  },
+                  controller: _namaController,
+                  decoration: InputDecoration(hintText: "Masukkan nama"),
+                ),
+                TextFormField(
+                  validator: (value) {
+                    return value.isNotEmpty ? null : "Invalid field";
+                  },
+                  controller: _reviewController,
+                  decoration: InputDecoration(hintText: "Masukkan review"),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                "Cancel",
+                style: TextStyle(color: darkColor),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                if (_formKey.currentState.validate()) {
+                  _addReview({
+                    'id': widget.id,
+                    'name': _namaController.text,
+                    'review': _reviewController.text
+                  });
+                  Navigator.of(context).pop();
+                }
+              },
+              child: Text(
+                "Save",
+                style: TextStyle(color: darkColor),
+              ),
+            ),
+          ],
+        );
+      });
 }
