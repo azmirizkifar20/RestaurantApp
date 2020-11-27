@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/api/result_state.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
-import 'package:restaurant_app/utils/style/styles.dart';
+import 'package:restaurant_app/view/review_page.dart';
 import 'package:restaurant_app/widget/card_category.dart';
 import 'package:restaurant_app/widget/card_menu.dart';
 import 'package:restaurant_app/widget/card_review.dart';
@@ -21,7 +21,6 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final provider = RestaurantDetailProvider(apiService: ApiService());
   static const _imageUrl = 'https://restaurant-api.dicoding.dev/images/medium';
 
@@ -29,11 +28,6 @@ class _DetailPageState extends State<DetailPage> {
   void initState() {
     provider.fetchDetailRestaurant(widget.id);
     super.initState();
-  }
-
-  void _addReview(Map data) {
-    provider.addReview(data);
-    provider.fetchDetailRestaurant(widget.id);
   }
 
   @override
@@ -88,7 +82,7 @@ class _DetailPageState extends State<DetailPage> {
                     }
                   },
                   body: Container(
-                    transform: Matrix4.translationValues(0.0, -16.0, 0.0),
+                    transform: Matrix4.translationValues(0.0, -8.0, 0.0),
                     child: _content(context, value.result.restaurant),
                   ),
                 );
@@ -108,19 +102,12 @@ class _DetailPageState extends State<DetailPage> {
             }
           },
         ),
-        floatingActionButton: FloatingActionButton(
-          tooltip: "Add review",
-          backgroundColor: toscaColor,
-          child: Icon(Icons.edit, color: primaryColor),
-          onPressed: () => showFormDialog(context),
-        ),
       ),
     );
   }
 
   Padding _content(BuildContext context, Restaurant restaurant) => Padding(
         padding: EdgeInsets.symmetric(
-          vertical: 10,
           horizontal: 16,
         ),
         child: SafeArea(
@@ -128,7 +115,6 @@ class _DetailPageState extends State<DetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // SizedBox(height: 8),
                 Text(
                   restaurant.name,
                   style: Theme.of(context).textTheme.headline5,
@@ -211,7 +197,13 @@ class _DetailPageState extends State<DetailPage> {
                         color: Colors.grey[600],
                         size: 30.0,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          ReviewPage.routeName,
+                          arguments: restaurant.id,
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -234,91 +226,4 @@ class _DetailPageState extends State<DetailPage> {
 
     return children;
   }
-
-  Future<void> showFormDialog(BuildContext context) async => await showDialog(
-      context: context,
-      builder: (context) {
-        final TextEditingController _namaController = TextEditingController();
-        final TextEditingController _reviewController = TextEditingController();
-
-        return AlertDialog(
-          content: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Tambah review',
-                  style: TextStyle(fontSize: 20, color: darkColor),
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  validator: (value) {
-                    return value.isNotEmpty ? null : "Nama wajib diisi";
-                  },
-                  controller: _namaController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black45),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black45),
-                    ),
-                    labelText: 'Masukkan nama',
-                    hintStyle: TextStyle(color: darkColor),
-                    labelStyle: TextStyle(color: darkColor),
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextFormField(
-                  validator: (value) {
-                    return value.isNotEmpty ? null : "Invalid field";
-                  },
-                  minLines: 3,
-                  maxLines: 5,
-                  controller: _reviewController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black45),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black45),
-                    ),
-                    labelText: 'Masukkan review',
-                    hintStyle: TextStyle(color: darkColor),
-                    labelStyle: TextStyle(color: darkColor),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                "Cancel",
-                style: TextStyle(color: darkColor),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                if (_formKey.currentState.validate()) {
-                  _addReview({
-                    'id': widget.id,
-                    'name': _namaController.text,
-                    'review': _reviewController.text
-                  });
-                  Navigator.of(context).pop();
-                }
-              },
-              child: Text(
-                "Save",
-                style: TextStyle(color: darkColor),
-              ),
-            ),
-          ],
-        );
-      });
 }
