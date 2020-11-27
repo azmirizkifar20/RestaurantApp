@@ -1,21 +1,18 @@
-class RestaurantResult {
-  RestaurantResult({
+class RestaurantSearchResult {
+  RestaurantSearchResult({
     this.error,
-    this.message,
-    this.count,
+    this.founded,
     this.restaurants,
   });
 
   bool error;
-  String message;
-  int count;
+  int founded;
   List<Restaurant> restaurants;
 
-  factory RestaurantResult.fromJson(Map<String, dynamic> json) =>
-      RestaurantResult(
+  factory RestaurantSearchResult.fromJson(Map<String, dynamic> json) =>
+      RestaurantSearchResult(
         error: json["error"],
-        message: json["message"],
-        count: json["count"],
+        founded: json["founded"],
         restaurants: List<Restaurant>.from(
             json["restaurants"].map((x) => Restaurant.fromJson(x))),
       );

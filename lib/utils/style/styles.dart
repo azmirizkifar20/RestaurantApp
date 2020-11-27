@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 Color darkColor = Color(0xFF414C6B);
-Color toscaColor = Color(0xFF21BFBD);
+Color toscaColor = Color(0xFF13A0B8);
 final MaterialColor primaryColor = MaterialColor(0xFFFFFFFF, colorCodes);
 final MaterialColor secondaryColor = MaterialColor(0xFF21BFBD, colorCodes);
 

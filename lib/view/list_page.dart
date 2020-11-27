@@ -1,41 +1,62 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/data/model/restaurant.dart';
-import 'package:restaurant_app/utils/styles.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/data/api/api_service.dart';
+import 'package:restaurant_app/data/api/result_state.dart';
+import 'package:restaurant_app/utils/providers/restaurant_provider.dart';
+import 'package:restaurant_app/utils/style/styles.dart';
 import 'package:restaurant_app/view/detail_page.dart';
+import 'package:restaurant_app/view/search_page.dart';
+import 'package:restaurant_app/widget/card_restaurant.dart';
 
-class ListPage extends StatelessWidget {
+class ListPage extends StatefulWidget {
   static const routeName = '/list_page';
 
+  @override
+  _ListPageState createState() => _ListPageState();
+}
+
+class _ListPageState extends State<ListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: toscaColor,
-      body: Container(
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [_header(), _boxItems(context)],
-          ),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [_header(), _boxItems()],
         ),
       ),
     );
   }
 
   Container _header() => Container(
-        margin: EdgeInsets.only(top: 24, left: 24),
+        margin: EdgeInsets.only(top: 12, left: 24, right: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Restaurant',
-              style: TextStyle(
-                fontSize: 24,
-                color: Colors.white,
-                fontFamily: 'Oxygen',
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              children: [
+                Text(
+                  'Restaurant',
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: Colors.white,
+                    fontFamily: 'Oxygen',
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Spacer(),
+                IconButton(
+                  icon: Icon(
+                    Icons.search,
+                    color: Colors.white,
+                    size: 26,
+                  ),
+                  onPressed: () =>
+                      Navigator.pushNamed(context, SearchPage.routeName),
+                ),
+              ],
             ),
-            SizedBox(height: 6),
             Text(
               'Recomended restaurant for you!',
               style: TextStyle(
@@ -48,103 +69,58 @@ class ListPage extends StatelessWidget {
         ),
       );
 
-  Expanded _boxItems(BuildContext context) => Expanded(
+  Expanded _boxItems() => Expanded(
         child: Container(
           margin: EdgeInsets.only(top: 24),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(topRight: Radius.circular(75.0)),
           ),
-          child: FutureBuilder(
-            future: DefaultAssetBundle.of(context)
-                .loadString('assets/restaurant.json'),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return Center(child: Text("Sedang memuat data..."));
-              }
-
-              List<Restaurant> listData = parseRestaurant(snapshot.data);
-              return listData.isEmpty
-                  ? Center(child: Text("Data kosong:("))
-                  : ListView.builder(
-                      padding: EdgeInsets.only(top: 8),
-                      itemCount: listData.length,
-                      itemBuilder: (context, index) {
-                        return InkWell(
-                          onTap: () => Navigator.pushNamed(
-                            context,
-                            DetailPage.routeName,
-                            arguments: listData[index],
-                          ),
-                          child: _listItems(listData[index]),
-                        );
-                      },
-                    );
-            },
+          child: ChangeNotifierProvider<RestaurantProvider>(
+            create: (_) => RestaurantProvider(apiService: ApiService()),
+            child: _consumer(),
           ),
         ),
       );
 
-  Widget _listItems(Restaurant restaurant) {
-    return Container(
-      padding: EdgeInsets.all(10),
-      child: Row(
-        children: [
-          Hero(
-            tag: restaurant.pictureId,
-            child: Material(
-              child: InkWell(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.network(
-                    restaurant.pictureId,
-                    width: 120,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: 12),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  restaurant.name,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: darkColor,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.location_pin,
-                      color: Colors.black45,
-                      size: 14,
+  Consumer<RestaurantProvider> _consumer() => Consumer(
+        builder: (context, value, _) {
+          switch (value.state) {
+            case ResultState.Loading:
+              return Center(child: CircularProgressIndicator());
+              break;
+
+            case ResultState.HasData:
+              return ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.only(top: 8),
+                itemCount: value.result.count,
+                itemBuilder: (context, index) {
+                  var restaurant = value.result.restaurants[index];
+                  return InkWell(
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      DetailPage.routeName,
+                      arguments: restaurant.id,
                     ),
-                    SizedBox(width: 4),
-                    Text(restaurant.city)
-                  ],
-                ),
-                SizedBox(height: 16),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.star,
-                      color: Colors.black,
-                      size: 14,
-                    ),
-                    SizedBox(width: 4),
-                    Text(restaurant.rating.toString())
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+                    child: CardRestaurant(restaurant: restaurant),
+                  );
+                },
+              );
+              break;
+
+            case ResultState.NoData:
+              return Center(child: Text(value.message));
+              break;
+
+            case ResultState.Error:
+              return Center(child: Text(value.message));
+              break;
+
+            default:
+              return Center(child: Text(''));
+              break;
+          }
+        },
+      );
 }
