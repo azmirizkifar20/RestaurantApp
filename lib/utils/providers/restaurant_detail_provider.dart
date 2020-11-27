@@ -23,7 +23,6 @@ class RestaurantDetailProvider extends ChangeNotifier {
 
   Future<dynamic> fetchDetailRestaurant(String id) async {
     try {
-      print("get detail terpanggil");
       _state = ResultState.Loading;
       notifyListeners();
       final data = await apiService.detailRestaurant(id);

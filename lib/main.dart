@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Restaurant Apps',
       theme: ThemeData(
-        primarySwatch: primaryColor,
+        primaryColor: toscaColor,
         accentColor: secondaryColor,
         scaffoldBackgroundColor: Colors.white,
         visualDensity: VisualDensity.adaptivePlatformDensity,

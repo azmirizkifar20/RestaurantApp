@@ -4,15 +4,16 @@ import 'package:restaurant_app/utils/style/styles.dart';
 
 class CardReview extends StatelessWidget {
   final List<CustomerReview> listReview;
+  final int itemSize;
 
-  const CardReview({Key key, @required this.listReview}) : super(key: key);
+  const CardReview({Key key, @required this.listReview, this.itemSize});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: ListView.builder(
         shrinkWrap: true,
-        itemCount: listReview.length,
+        itemCount: itemSize == null ? listReview.length : itemSize,
         itemBuilder: (context, index) {
           return _itemReview(listReview[index]);
         },

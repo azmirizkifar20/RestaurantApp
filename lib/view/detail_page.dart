@@ -38,186 +38,187 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: ChangeNotifierProvider<RestaurantDetailProvider>(
-            create: (_) => provider,
-            child: _consumer(),
-          ),
+    return ChangeNotifierProvider<RestaurantDetailProvider>(
+      create: (_) => provider,
+      child: Scaffold(
+        body: Consumer<RestaurantDetailProvider>(
+          builder: (context, value, _) {
+            switch (value.state) {
+              case ResultState.Loading:
+                return Center(child: CircularProgressIndicator());
+                break;
+
+              case ResultState.HasData:
+                return NestedScrollView(
+                  headerSliverBuilder: (context, innerBoxIsScrolled) {
+                    if (innerBoxIsScrolled) {
+                      return [
+                        SliverAppBar(
+                          pinned: true,
+                          expandedHeight: 220,
+                          flexibleSpace: FlexibleSpaceBar(
+                            background: Hero(
+                              tag: value.result.restaurant.pictureId,
+                              child: Image.network(
+                                '$_imageUrl/${value.result.restaurant.pictureId}',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            title: Text(value.result.restaurant.name),
+                            titlePadding: EdgeInsets.only(left: 54, bottom: 16),
+                          ),
+                        )
+                      ];
+                    } else {
+                      return [
+                        SliverAppBar(
+                          pinned: true,
+                          expandedHeight: 220,
+                          flexibleSpace: FlexibleSpaceBar(
+                            background: Hero(
+                              tag: value.result.restaurant.pictureId,
+                              child: Image.network(
+                                '$_imageUrl/${value.result.restaurant.pictureId}',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        )
+                      ];
+                    }
+                  },
+                  body: Container(
+                    transform: Matrix4.translationValues(0.0, -16.0, 0.0),
+                    child: _content(context, value.result.restaurant),
+                  ),
+                );
+                break;
+
+              case ResultState.NoData:
+                return Center(child: Text(value.message));
+                break;
+
+              case ResultState.Error:
+                return Center(child: Text(value.message));
+                break;
+
+              default:
+                return Center(child: Text(''));
+                break;
+            }
+          },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: "Add review",
-        child: Icon(Icons.edit, color: primaryColor),
-        onPressed: () => showFormDialog(context),
+        floatingActionButton: FloatingActionButton(
+          tooltip: "Add review",
+          backgroundColor: toscaColor,
+          child: Icon(Icons.edit, color: primaryColor),
+          onPressed: () => showFormDialog(context),
+        ),
       ),
     );
   }
-
-  Consumer<RestaurantDetailProvider> _consumer() => Consumer(
-        builder: (context, value, _) {
-          switch (value.state) {
-            case ResultState.Loading:
-              return Container(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.height,
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-              break;
-
-            case ResultState.HasData:
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _header(context, value.result.restaurant),
-                  SizedBox(height: 8),
-                  _content(context, value.result.restaurant),
-                ],
-              );
-              break;
-
-            case ResultState.NoData:
-              return Center(child: Text(value.message));
-              break;
-
-            case ResultState.Error:
-              return Center(child: Text(value.message));
-              break;
-
-            default:
-              return Center(child: Text(''));
-              break;
-          }
-        },
-      );
-
-  Stack _header(BuildContext context, Restaurant restaurant) => Stack(
-        children: [
-          Hero(
-            tag: restaurant.pictureId,
-            child: Material(
-              child: InkWell(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(25),
-                    bottomRight: Radius.circular(25),
-                  ),
-                  child: Image.network('$_imageUrl/${restaurant.pictureId}'),
-                ),
-              ),
-            ),
-          ),
-          // back button
-          InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Padding(
-              padding: EdgeInsets.only(top: 8, left: 8),
-              child: Material(
-                borderRadius: BorderRadius.all(Radius.circular(50)),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.arrow_back_ios_rounded,
-                    color: Colors.black87,
-                    size: 24,
-                  ),
-                ),
-              ),
-            ),
-          )
-        ],
-      );
 
   Padding _content(BuildContext context, Restaurant restaurant) => Padding(
         padding: EdgeInsets.symmetric(
           vertical: 10,
           horizontal: 16,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              restaurant.name,
-              style: Theme.of(context).textTheme.headline5,
-            ),
-            SizedBox(height: 6),
-            Row(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.location_pin,
-                  color: Colors.grey[400],
-                  size: 18,
-                ),
-                SizedBox(width: 4),
+                // SizedBox(height: 8),
                 Text(
-                  restaurant.address,
+                  restaurant.name,
+                  style: Theme.of(context).textTheme.headline5,
+                ),
+                SizedBox(height: 6),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.location_pin,
+                      color: Colors.grey[400],
+                      size: 18,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      restaurant.address,
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    Spacer(),
+                    Row(
+                      children: _rating(restaurant.rating),
+                    )
+                  ],
+                ),
+                SizedBox(height: 10),
+                CardCategory(listData: restaurant.categories),
+
+                // pembatas
+                SizedBox(height: 5),
+                Divider(color: Colors.grey),
+                SizedBox(height: 10),
+                Text(
+                  'Deskripsi',
+                  style: TextStyle(fontSize: 20, color: Colors.grey[600]),
+                ),
+                SizedBox(height: 6),
+                Text(
+                  restaurant.description,
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
-                Spacer(),
+
+                // pembatas
+                SizedBox(height: 10),
+                Divider(color: Colors.grey),
+                SizedBox(height: 10),
+
+                // menu foods
+                Text(
+                  'Menu makanan',
+                  style: TextStyle(fontSize: 20, color: Colors.grey[600]),
+                ),
+                SizedBox(height: 6),
+                CardMenu(listData: restaurant.menus.foods),
+
+                // pembatas
+                SizedBox(height: 15),
+
+                // menu foods
+                Text(
+                  'Menu minuman',
+                  style: TextStyle(fontSize: 20, color: Colors.grey[600]),
+                ),
+                SizedBox(height: 6),
+                CardMenu(listData: restaurant.menus.drinks),
+
+                // pembatas
+                SizedBox(height: 10),
+                Divider(color: Colors.grey),
+
+                // review
                 Row(
-                  children: _rating(restaurant.rating),
-                )
+                  children: [
+                    Text(
+                      'Review customer',
+                      style: TextStyle(fontSize: 20, color: Colors.grey[600]),
+                    ),
+                    Spacer(),
+                    IconButton(
+                      icon: Icon(
+                        Icons.more_horiz,
+                        color: Colors.grey[600],
+                        size: 30.0,
+                      ),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+                CardReview(listReview: restaurant.customerReviews, itemSize: 2),
               ],
             ),
-            SizedBox(height: 10),
-            CardCategory(listData: restaurant.categories),
-
-            // pembatas
-            SizedBox(height: 5),
-            Divider(color: Colors.grey),
-            SizedBox(height: 10),
-            Text(
-              'Deskripsi',
-              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
-            ),
-            SizedBox(height: 6),
-            Text(
-              restaurant.description,
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-
-            // pembatas
-            SizedBox(height: 10),
-            Divider(color: Colors.grey),
-            SizedBox(height: 10),
-
-            // menu foods
-            Text(
-              'Menu makanan',
-              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
-            ),
-            SizedBox(height: 6),
-            CardMenu(listData: restaurant.menus.foods),
-
-            // pembatas
-            SizedBox(height: 15),
-
-            // menu foods
-            Text(
-              'Menu minuman',
-              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
-            ),
-            SizedBox(height: 6),
-            CardMenu(listData: restaurant.menus.drinks),
-
-            // pembatas
-            SizedBox(height: 10),
-            Divider(color: Colors.grey),
-            SizedBox(height: 10),
-
-            // review
-            Text(
-              'Review customer',
-              style: TextStyle(fontSize: 20, color: Colors.grey[600]),
-            ),
-            SizedBox(height: 6),
-            CardReview(listReview: restaurant.customerReviews)
-          ],
+          ),
         ),
       );
 
@@ -250,20 +251,43 @@ class _DetailPageState extends State<DetailPage> {
                   'Tambah review',
                   style: TextStyle(fontSize: 20, color: darkColor),
                 ),
-                SizedBox(height: 6),
+                SizedBox(height: 20),
                 TextFormField(
                   validator: (value) {
                     return value.isNotEmpty ? null : "Nama wajib diisi";
                   },
                   controller: _namaController,
-                  decoration: InputDecoration(hintText: "Masukkan nama"),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black45),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black45),
+                    ),
+                    labelText: 'Masukkan nama',
+                    hintStyle: TextStyle(color: darkColor),
+                    labelStyle: TextStyle(color: darkColor),
+                  ),
                 ),
+                SizedBox(height: 16),
                 TextFormField(
                   validator: (value) {
                     return value.isNotEmpty ? null : "Invalid field";
                   },
+                  minLines: 3,
+                  maxLines: 5,
                   controller: _reviewController,
-                  decoration: InputDecoration(hintText: "Masukkan review"),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black45),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black45),
+                    ),
+                    labelText: 'Masukkan review',
+                    hintStyle: TextStyle(color: darkColor),
+                    labelStyle: TextStyle(color: darkColor),
+                  ),
                 ),
               ],
             ),

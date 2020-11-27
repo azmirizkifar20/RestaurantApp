@@ -55,7 +55,10 @@ class CardRestaurant extends StatelessWidget {
                   size: 14,
                 ),
                 SizedBox(width: 4),
-                Text(restaurant.city ?? "")
+                Text(
+                  restaurant.city ?? "",
+                  style: TextStyle(color: Colors.black45),
+                )
               ],
             ),
             SizedBox(height: 16),
@@ -63,11 +66,14 @@ class CardRestaurant extends StatelessWidget {
               children: [
                 Icon(
                   Icons.star,
-                  color: Colors.black,
+                  color: Colors.yellow[600],
                   size: 14,
                 ),
                 SizedBox(width: 4),
-                Text(restaurant.rating.toString() ?? "")
+                Text(
+                  restaurant.rating.toString() ?? "",
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                )
               ],
             ),
           ],
