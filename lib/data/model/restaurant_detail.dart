@@ -1,3 +1,5 @@
+import 'package:restaurant_app/data/model/add_review.dart';
+
 class RestaurantDetailResult {
   RestaurantDetailResult({
     this.error,
@@ -67,24 +69,6 @@ class Category {
 
   factory Category.fromJson(Map<String, dynamic> json) => Category(
         name: json["name"],
-      );
-}
-
-class CustomerReview {
-  CustomerReview({
-    this.name,
-    this.review,
-    this.date,
-  });
-
-  String name;
-  String review;
-  String date;
-
-  factory CustomerReview.fromJson(Map<String, dynamic> json) => CustomerReview(
-        name: json["name"],
-        review: json["review"],
-        date: json["date"],
       );
 }
 
