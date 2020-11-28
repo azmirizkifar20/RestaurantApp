@@ -20,7 +20,6 @@ class _ReviewPageState extends State<ReviewPage> {
   bool _hasAdd = false;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final provider = RestaurantDetailProvider(apiService: ApiService());
-  bool _isVisible = false;
 
   @override
   void initState() {
@@ -32,12 +31,6 @@ class _ReviewPageState extends State<ReviewPage> {
     _hasAdd = true;
     provider.addReview(data);
     provider.fetchDetailRestaurant(widget.restaurantId);
-  }
-
-  void _visibleFab() {
-    setState(() {
-      _isVisible = true;
-    });
   }
 
   @override
@@ -60,7 +53,6 @@ class _ReviewPageState extends State<ReviewPage> {
 
               case ResultState.HasData:
                 if (!_hasAdd) {
-                  // _visibleFab();
                   print('belum nambah');
                   return Padding(
                     padding: const EdgeInsets.all(16),
@@ -69,7 +61,6 @@ class _ReviewPageState extends State<ReviewPage> {
                     ),
                   );
                 } else {
-                  // _visibleFab();
                   print('udah nambah');
                   return Padding(
                     padding: const EdgeInsets.all(16),
@@ -80,17 +71,14 @@ class _ReviewPageState extends State<ReviewPage> {
                 }
                 break;
               case ResultState.NoData:
-                // _visibleFab();
                 return Center(child: Text(value.message));
                 break;
 
               case ResultState.Error:
-                // _visibleFab();
                 return Center(child: Text(value.message));
                 break;
 
               default:
-                // _visibleFab();
                 return Center(child: Text(''));
                 break;
             }
