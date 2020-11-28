@@ -17,6 +17,7 @@ class ReviewPage extends StatefulWidget {
 }
 
 class _ReviewPageState extends State<ReviewPage> {
+  bool _hasAdd = false;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final provider = RestaurantDetailProvider(apiService: ApiService());
 
@@ -27,6 +28,7 @@ class _ReviewPageState extends State<ReviewPage> {
   }
 
   void _addReview(Map data) {
+    _hasAdd = true;
     provider.addReview(data);
     provider.fetchDetailRestaurant(widget.restaurantId);
   }
@@ -50,12 +52,23 @@ class _ReviewPageState extends State<ReviewPage> {
                 break;
 
               case ResultState.HasData:
-                return Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: CardReview(
-                    listReview: value.result.restaurant.customerReviews,
-                  ),
-                );
+                if (!_hasAdd) {
+                  print('belum nambah');
+                  return Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: CardReview(
+                      listReview: value.result.restaurant.customerReviews,
+                    ),
+                  );
+                } else {
+                  print('udah nambah');
+                  return Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: CardReview(
+                      listReview: value.reviewResult.customerReviews,
+                    ),
+                  );
+                }
                 break;
               case ResultState.NoData:
                 return Center(child: Text(value.message));
@@ -71,11 +84,18 @@ class _ReviewPageState extends State<ReviewPage> {
             }
           },
         ),
-        floatingActionButton: FloatingActionButton(
-          tooltip: "Add review",
-          backgroundColor: toscaColor,
-          child: Icon(Icons.edit, color: primaryColor),
-          onPressed: () => showFormDialog(context),
+        floatingActionButton: Consumer<RestaurantDetailProvider>(
+          builder: (context, value, _) {
+            return Visibility(
+              visible: provider.isLoading,
+              child: FloatingActionButton(
+                tooltip: "Add review",
+                backgroundColor: toscaColor,
+                child: Icon(Icons.edit, color: primaryColor),
+                onPressed: () => showFormDialog(context),
+              ),
+            );
+          },
         ),
       ),
     );

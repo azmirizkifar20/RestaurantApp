@@ -13,10 +13,12 @@ class RestaurantDetailProvider extends ChangeNotifier {
 
   RestaurantDetailResult _detailResult;
   AddReviewResult _reviewResult;
+  bool _isLoading = false;
   String _message = '';
   ResultState _state;
 
   String get message => _message;
+  bool get isLoading => _isLoading;
   RestaurantDetailResult get result => _detailResult;
   AddReviewResult get reviewResult => _reviewResult;
   ResultState get state => _state;
@@ -28,15 +30,18 @@ class RestaurantDetailProvider extends ChangeNotifier {
       final data = await apiService.detailRestaurant(id);
 
       if (data.restaurant == null) {
+        _isLoading = true;
         _state = ResultState.NoData;
         notifyListeners();
         return _message = 'Empty data';
       } else {
+        _isLoading = true;
         _state = ResultState.HasData;
         notifyListeners();
         return _detailResult = data;
       }
     } catch (e) {
+      _isLoading = true;
       _state = ResultState.Error;
       notifyListeners();
       return _message = 'Error --> $e';
@@ -51,15 +56,18 @@ class RestaurantDetailProvider extends ChangeNotifier {
       final data = await apiService.addReview(body);
 
       if (data.customerReviews.isEmpty) {
+        _isLoading = true;
         _state = ResultState.NoData;
         notifyListeners();
         return _message = 'Empty data';
       } else {
+        _isLoading = true;
         _state = ResultState.HasData;
         notifyListeners();
         return _reviewResult = data;
       }
     } catch (e) {
+      _isLoading = true;
       _state = ResultState.Error;
       notifyListeners();
       return _message = 'Error --> $e';
