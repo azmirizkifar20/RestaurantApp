@@ -44,7 +44,8 @@ class RestaurantDetailProvider extends ChangeNotifier {
       _isLoading = true;
       _state = ResultState.Error;
       notifyListeners();
-      return _message = 'Error --> $e';
+      return _message =
+          'Anda sedang tidak mengakses internet, harap sambungkan koneksi internet di hp anda!';
     }
   }
 
@@ -70,7 +71,8 @@ class RestaurantDetailProvider extends ChangeNotifier {
       _isLoading = true;
       _state = ResultState.Error;
       notifyListeners();
-      return _message = 'Error --> $e';
+      return _message =
+          'Anda sedang tidak mengakses internet, harap sambungkan koneksi internet di hp anda!';
     }
   }
 }

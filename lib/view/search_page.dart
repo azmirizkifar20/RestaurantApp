@@ -131,11 +131,25 @@ class _SearchPageState extends State<SearchPage> {
               break;
 
             case ResultState.NoData:
-              return Center(child: Text(value.message));
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Center(
+                    child: Text(
+                  value.message,
+                  textAlign: TextAlign.center,
+                )),
+              );
               break;
 
             case ResultState.Error:
-              return Center(child: Text(value.message));
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Center(
+                    child: Text(
+                  value.message,
+                  textAlign: TextAlign.center,
+                )),
+              );
               break;
 
             default:

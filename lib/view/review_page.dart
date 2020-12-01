@@ -30,7 +30,6 @@ class _ReviewPageState extends State<ReviewPage> {
   void _addReview(Map data) {
     _hasAdd = true;
     provider.addReview(data);
-    provider.fetchDetailRestaurant(widget.restaurantId);
   }
 
   @override
@@ -53,7 +52,6 @@ class _ReviewPageState extends State<ReviewPage> {
 
               case ResultState.HasData:
                 if (!_hasAdd) {
-                  print('belum nambah');
                   return Padding(
                     padding: const EdgeInsets.all(16),
                     child: CardReview(
@@ -61,7 +59,6 @@ class _ReviewPageState extends State<ReviewPage> {
                     ),
                   );
                 } else {
-                  print('udah nambah');
                   return Padding(
                     padding: const EdgeInsets.all(16),
                     child: CardReview(
@@ -71,11 +68,25 @@ class _ReviewPageState extends State<ReviewPage> {
                 }
                 break;
               case ResultState.NoData:
-                return Center(child: Text(value.message));
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                      child: Text(
+                    value.message,
+                    textAlign: TextAlign.center,
+                  )),
+                );
                 break;
 
               case ResultState.Error:
-                return Center(child: Text(value.message));
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                      child: Text(
+                    value.message,
+                    textAlign: TextAlign.center,
+                  )),
+                );
                 break;
 
               default:
