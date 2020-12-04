@@ -1,10 +1,10 @@
 import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/api/result_state.dart';
 import 'package:restaurant_app/data/model/add_review.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
+import 'package:restaurant_app/utils/providers/constants.dart';
 
 class RestaurantDetailProvider extends ChangeNotifier {
   final ApiService apiService;
@@ -33,7 +33,7 @@ class RestaurantDetailProvider extends ChangeNotifier {
         _isLoading = true;
         _state = ResultState.NoData;
         notifyListeners();
-        return _message = 'Empty data';
+        return _message = emptyMessage;
       } else {
         _isLoading = true;
         _state = ResultState.HasData;
@@ -44,8 +44,7 @@ class RestaurantDetailProvider extends ChangeNotifier {
       _isLoading = true;
       _state = ResultState.Error;
       notifyListeners();
-      return _message =
-          'Anda sedang tidak mengakses internet, harap sambungkan koneksi internet di hp anda!';
+      return _message = errorMessage;
     }
   }
 
@@ -60,7 +59,7 @@ class RestaurantDetailProvider extends ChangeNotifier {
         _isLoading = true;
         _state = ResultState.NoData;
         notifyListeners();
-        return _message = 'Empty data';
+        return _message = emptyMessage;
       } else {
         _isLoading = true;
         _state = ResultState.HasData;
@@ -71,8 +70,7 @@ class RestaurantDetailProvider extends ChangeNotifier {
       _isLoading = true;
       _state = ResultState.Error;
       notifyListeners();
-      return _message =
-          'Anda sedang tidak mengakses internet, harap sambungkan koneksi internet di hp anda!';
+      return _message = errorMessage;
     }
   }
 }
