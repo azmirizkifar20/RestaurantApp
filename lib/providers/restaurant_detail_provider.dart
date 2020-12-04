@@ -4,7 +4,7 @@ import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/api/result_state.dart';
 import 'package:restaurant_app/data/model/add_review.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
-import 'package:restaurant_app/utils/providers/constants.dart';
+import 'package:restaurant_app/utils/constants.dart';
 
 class RestaurantDetailProvider extends ChangeNotifier {
   final ApiService apiService;

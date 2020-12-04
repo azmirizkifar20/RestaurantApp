@@ -1,29 +1,27 @@
 import 'package:flutter/foundation.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/api/result_state.dart';
-import 'package:restaurant_app/data/model/restaurant.dart';
-import 'package:restaurant_app/utils/providers/constants.dart';
+import 'package:restaurant_app/data/model/restaurant_search.dart';
+import 'package:restaurant_app/utils/constants.dart';
 
-class RestaurantProvider extends ChangeNotifier {
+class RestaurantSearchProvider extends ChangeNotifier {
   final ApiService apiService;
 
-  RestaurantProvider({@required this.apiService}) {
-    _fetchAllRestaurant();
-  }
+  RestaurantSearchProvider({@required this.apiService});
 
-  RestaurantResult _restaurantResult;
+  RestaurantSearchResult _searchResult;
   String _message = '';
   ResultState _state;
 
   String get message => _message;
-  RestaurantResult get result => _restaurantResult;
+  RestaurantSearchResult get result => _searchResult;
   ResultState get state => _state;
 
-  Future<dynamic> _fetchAllRestaurant() async {
+  Future<dynamic> fetchSearchRestaurant(String search) async {
     try {
       _state = ResultState.Loading;
       notifyListeners();
-      final data = await apiService.listRestaurant();
+      final data = await apiService.searchRestaurant(search);
 
       if (data.restaurants.isEmpty) {
         _state = ResultState.NoData;
@@ -32,7 +30,7 @@ class RestaurantProvider extends ChangeNotifier {
       } else {
         _state = ResultState.HasData;
         notifyListeners();
-        return _restaurantResult = data;
+        return _searchResult = data;
       }
     } catch (e) {
       _state = ResultState.Error;

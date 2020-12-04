@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:restaurant_app/data/api/result_state.dart';
 import 'package:restaurant_app/data/db/database_helper.dart';
 import 'package:restaurant_app/data/model/restaurant_favorite.dart';
-import 'package:restaurant_app/utils/providers/constants.dart';
+import 'package:restaurant_app/utils/constants.dart';
 
 class DatabaseProvider extends ChangeNotifier {
   final DatabaseHelper databaseHelper;

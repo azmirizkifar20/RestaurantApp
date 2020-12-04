@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/data/model/restaurant_favorite.dart';
-import 'package:restaurant_app/utils/style/styles.dart';
+import 'package:restaurant_app/common/styles.dart';
 
 class CardFavorite extends StatelessWidget {
   final Favorite restaurant;

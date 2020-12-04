@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/utils/style/styles.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/data/preferences/preferences_helper.dart';
+import 'package:restaurant_app/providers/preferences_provider.dart';
+import 'package:restaurant_app/common/styles.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingPage extends StatefulWidget {
   static const routeName = '/setting_page';
@@ -9,8 +14,6 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  bool isSwitched = true;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,30 +23,52 @@ class _SettingPageState extends State<SettingPage> {
         title: Text("Settings"),
         centerTitle: true,
       ),
-      body: ListView(
-        children: [
-          ListTile(
-            leading: Padding(
-              padding: const EdgeInsets.only(top: 8, left: 8),
-              child: Icon(
-                Icons.notifications,
-                color: toscaColor,
+      body: ChangeNotifierProvider(
+        create: (_) => PreferencesProvider(
+          preferencesHelper: PreferencesHelper(
+            sharedPreferences: SharedPreferences.getInstance(),
+          ),
+        ),
+        child: ListView(
+          children: [
+            Consumer<PreferencesProvider>(
+              builder: (context, provider, _) {
+                return ListTile(
+                  leading: Padding(
+                    padding: const EdgeInsets.only(top: 8, left: 8),
+                    child: Icon(
+                      Icons.notifications,
+                      color: toscaColor,
+                    ),
+                  ),
+                  title: Text('Restaurant notification'),
+                  subtitle: Text('Notify me at 11 A.M'),
+                  trailing: Switch(
+                    value: provider.isNotificationActive,
+                    onChanged: (value) => provider.setNotificationStatus(value),
+                    activeTrackColor: materialToscaColor[100],
+                    activeColor: toscaColor,
+                  ),
+                );
+              },
+            ),
+            Divider(),
+            InkWell(
+              onTap: () => SystemNavigator.pop(),
+              child: ListTile(
+                leading: Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Icon(
+                    Icons.exit_to_app,
+                    color: toscaColor,
+                  ),
+                ),
+                title: Text('Exit application'),
               ),
             ),
-            title: Text('Restaurant notification'),
-            subtitle: Text('Notification enabled'),
-            trailing: Switch(
-              value: isSwitched,
-              onChanged: (value) {
-                setState(() {
-                  isSwitched = value;
-                });
-              },
-              activeTrackColor: materialToscaColor[100],
-              activeColor: toscaColor,
-            ),
-          )
-        ],
+            Divider(),
+          ],
+        ),
       ),
     );
   }

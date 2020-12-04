@@ -6,13 +6,13 @@ import 'package:restaurant_app/data/api/result_state.dart';
 import 'package:restaurant_app/data/db/database_helper.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
 import 'package:restaurant_app/data/model/restaurant_favorite.dart';
-import 'package:restaurant_app/utils/providers/database_provider.dart';
-import 'package:restaurant_app/utils/style/styles.dart';
+import 'package:restaurant_app/common/styles.dart';
+import 'package:restaurant_app/providers/database_provider.dart';
+import 'package:restaurant_app/providers/restaurant_detail_provider.dart';
 import 'package:restaurant_app/view/review_page.dart';
 import 'package:restaurant_app/widget/card_category.dart';
 import 'package:restaurant_app/widget/card_menu.dart';
 import 'package:restaurant_app/widget/card_review.dart';
-import 'package:restaurant_app/utils/providers/restaurant_detail_provider.dart';
 
 class DetailPage extends StatefulWidget {
   static const routeName = '/detail_page';
