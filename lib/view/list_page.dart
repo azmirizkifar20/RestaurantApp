@@ -4,6 +4,8 @@ import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/api/result_state.dart';
 import 'package:restaurant_app/common/styles.dart';
 import 'package:restaurant_app/providers/restaurant_provider.dart';
+import 'package:restaurant_app/utils/background_service.dart';
+import 'package:restaurant_app/utils/notification_helper.dart';
 import 'package:restaurant_app/view/detail_page.dart';
 import 'package:restaurant_app/view/favorite_page.dart';
 import 'package:restaurant_app/view/search_page.dart';
@@ -18,12 +20,32 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
+  // service
+  final NotificationHelper _notificationHelper = NotificationHelper();
+  final BackgroundService _service = BackgroundService();
+
+  // utilities
   String avatar = 'assets/ajmi.png';
   String name = 'Muhamad Azmi Rizkifar';
   String email = 'm.azmirizkifar20@gmail.com';
   String banner =
       'https://t3.ftcdn.net/jpg/03/21/64/02/240_F_321640237_gHHFy6q0CbWCCVU2DUB7WEZbOpayWjl2.jpg';
   GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    port.listen((_) async => await _service.someTask());
+    _notificationHelper.configureSelectNotificationSubject(
+      DetailPage.routeName,
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    selectNotificationSubject.close();
+  }
 
   @override
   Widget build(BuildContext context) {

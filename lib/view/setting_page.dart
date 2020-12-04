@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/data/preferences/preferences_helper.dart';
-import 'package:restaurant_app/providers/preferences_provider.dart';
-import 'package:restaurant_app/common/styles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:restaurant_app/common/styles.dart';
+import 'package:restaurant_app/providers/SchedulingProvider.dart';
+import 'package:restaurant_app/data/preferences/preferences_helper.dart';
 
-class SettingPage extends StatefulWidget {
+class SettingPage extends StatelessWidget {
   static const routeName = '/setting_page';
 
-  @override
-  _SettingPageState createState() => _SettingPageState();
-}
-
-class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,15 +18,15 @@ class _SettingPageState extends State<SettingPage> {
         title: Text("Settings"),
         centerTitle: true,
       ),
-      body: ChangeNotifierProvider(
-        create: (_) => PreferencesProvider(
+      body: ChangeNotifierProvider<SchedulingProvider>(
+        create: (_) => SchedulingProvider(
           preferencesHelper: PreferencesHelper(
             sharedPreferences: SharedPreferences.getInstance(),
           ),
         ),
         child: ListView(
           children: [
-            Consumer<PreferencesProvider>(
+            Consumer<SchedulingProvider>(
               builder: (context, provider, _) {
                 return ListTile(
                   leading: Padding(
@@ -43,9 +38,11 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                   title: Text('Restaurant notification'),
                   subtitle: Text('Notify me at 11 A.M'),
-                  trailing: Switch(
-                    value: provider.isNotificationActive,
-                    onChanged: (value) => provider.setNotificationStatus(value),
+                  trailing: Switch.adaptive(
+                    value: provider.isScheduled,
+                    onChanged: (value) async {
+                      provider.scheduledRestaurant(value);
+                    },
                     activeTrackColor: materialToscaColor[100],
                     activeColor: toscaColor,
                   ),
