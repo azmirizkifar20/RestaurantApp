@@ -10,6 +10,7 @@ import 'package:restaurant_app/utils/notification_helper.dart';
 import 'package:restaurant_app/view/detail_page.dart';
 import 'package:restaurant_app/view/favorite_page.dart';
 import 'package:restaurant_app/view/list_page.dart';
+import 'package:restaurant_app/view/profile_page.dart';
 import 'package:restaurant_app/view/review_page.dart';
 import 'package:restaurant_app/view/search_page.dart';
 import 'package:restaurant_app/view/setting_page.dart';
@@ -55,6 +56,9 @@ class MyApp extends StatelessWidget {
             ),
         ReviewPage.routeName: (context) => ReviewPage(
               restaurantId: ModalRoute.of(context).settings.arguments,
+            ),
+        ProfilePage.routeName: (context) => ProfilePage(
+              gambar: ModalRoute.of(context).settings.arguments,
             )
       },
       navigatorKey: navigatorKey,

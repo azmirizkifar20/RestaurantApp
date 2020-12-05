@@ -51,7 +51,7 @@ class SettingPage extends StatelessWidget {
             ),
             Divider(),
             InkWell(
-              onTap: () => SystemNavigator.pop(),
+              onTap: () => _showDialog(context),
               child: ListTile(
                 leading: Padding(
                   padding: const EdgeInsets.only(left: 8),
@@ -69,4 +69,32 @@ class SettingPage extends StatelessWidget {
       ),
     );
   }
+
+  void _showDialog(BuildContext context) => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Perhatian"),
+          content: Text('Yakin ingin keluar aplikasi?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                "Tidak",
+                style: TextStyle(color: darkColor),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                SystemNavigator.pop();
+              },
+              child: Text(
+                "Ya",
+                style: TextStyle(color: darkColor),
+              ),
+            ),
+          ],
+        ),
+      );
 }

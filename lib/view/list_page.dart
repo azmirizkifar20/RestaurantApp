@@ -8,6 +8,7 @@ import 'package:restaurant_app/utils/background_service.dart';
 import 'package:restaurant_app/utils/notification_helper.dart';
 import 'package:restaurant_app/view/detail_page.dart';
 import 'package:restaurant_app/view/favorite_page.dart';
+import 'package:restaurant_app/view/profile_page.dart';
 import 'package:restaurant_app/view/search_page.dart';
 import 'package:restaurant_app/view/setting_page.dart';
 import 'package:restaurant_app/widget/card_restaurant.dart';
@@ -188,8 +189,21 @@ class _ListPageState extends State<ListPage> {
             UserAccountsDrawerHeader(
               accountName: Text(name),
               accountEmail: Text(email),
-              currentAccountPicture: CircleAvatar(
-                backgroundImage: AssetImage(avatar),
+              currentAccountPicture: Hero(
+                tag: avatar,
+                child: InkWell(
+                  child: CircleAvatar(
+                    backgroundImage: AssetImage(avatar),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    return Navigator.pushNamed(
+                      context,
+                      ProfilePage.routeName,
+                      arguments: avatar,
+                    );
+                  },
+                ),
               ),
               decoration: BoxDecoration(
                 image: DecorationImage(
