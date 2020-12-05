@@ -3,12 +3,16 @@ import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/api/result_state.dart';
+import 'package:restaurant_app/data/db/database_helper.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
+import 'package:restaurant_app/data/model/restaurant_favorite.dart';
+import 'package:restaurant_app/common/styles.dart';
+import 'package:restaurant_app/providers/database_provider.dart';
+import 'package:restaurant_app/providers/restaurant_detail_provider.dart';
 import 'package:restaurant_app/view/review_page.dart';
 import 'package:restaurant_app/widget/card_category.dart';
 import 'package:restaurant_app/widget/card_menu.dart';
 import 'package:restaurant_app/widget/card_review.dart';
-import 'package:restaurant_app/utils/providers/restaurant_detail_provider.dart';
 
 class DetailPage extends StatefulWidget {
   static const routeName = '/detail_page';
@@ -22,11 +26,13 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   final provider = RestaurantDetailProvider(apiService: ApiService());
+  final dbProvider = DatabaseProvider(databaseHelper: DatabaseHelper());
   static const _imageUrl = 'https://restaurant-api.dicoding.dev/images/medium';
 
   @override
   void initState() {
     provider.fetchDetailRestaurant(widget.id);
+    dbProvider.isFavorited(widget.id);
     super.initState();
   }
 
@@ -43,47 +49,59 @@ class _DetailPageState extends State<DetailPage> {
                 break;
 
               case ResultState.HasData:
-                return NestedScrollView(
-                  headerSliverBuilder: (context, innerBoxIsScrolled) {
-                    if (innerBoxIsScrolled) {
-                      return [
-                        SliverAppBar(
-                          pinned: true,
-                          expandedHeight: 220,
-                          flexibleSpace: FlexibleSpaceBar(
-                            background: Hero(
-                              tag: value.result.restaurant.pictureId,
-                              child: Image.network(
-                                '$_imageUrl/${value.result.restaurant.pictureId}',
-                                fit: BoxFit.cover,
+                return ChangeNotifierProvider<DatabaseProvider>.value(
+                  value: dbProvider,
+                  child: Consumer<DatabaseProvider>(
+                    builder: (context, dbValue, _) => NestedScrollView(
+                      headerSliverBuilder: (context, innerBoxIsScrolled) {
+                        if (innerBoxIsScrolled) {
+                          return [
+                            SliverAppBar(
+                              pinned: true,
+                              expandedHeight: 220,
+                              flexibleSpace: FlexibleSpaceBar(
+                                background: Hero(
+                                  tag: value.result.restaurant.pictureId,
+                                  child: Image.network(
+                                    '$_imageUrl/${value.result.restaurant.pictureId}',
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                title: Text(value.result.restaurant.name),
+                                titlePadding:
+                                    EdgeInsets.only(left: 54, bottom: 16),
                               ),
+                              actions: [
+                                _favoriteButton(value.result.restaurant),
+                              ],
                             ),
-                            title: Text(value.result.restaurant.name),
-                            titlePadding: EdgeInsets.only(left: 54, bottom: 16),
-                          ),
-                        )
-                      ];
-                    } else {
-                      return [
-                        SliverAppBar(
-                          pinned: true,
-                          expandedHeight: 220,
-                          flexibleSpace: FlexibleSpaceBar(
-                            background: Hero(
-                              tag: value.result.restaurant.pictureId,
-                              child: Image.network(
-                                '$_imageUrl/${value.result.restaurant.pictureId}',
-                                fit: BoxFit.cover,
+                          ];
+                        } else {
+                          return [
+                            SliverAppBar(
+                              pinned: true,
+                              expandedHeight: 220,
+                              flexibleSpace: FlexibleSpaceBar(
+                                background: Hero(
+                                  tag: value.result.restaurant.pictureId,
+                                  child: Image.network(
+                                    '$_imageUrl/${value.result.restaurant.pictureId}',
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        )
-                      ];
-                    }
-                  },
-                  body: Container(
-                    transform: Matrix4.translationValues(0.0, -8.0, 0.0),
-                    child: _content(context, value.result.restaurant),
+                              actions: [
+                                _favoriteButton(value.result.restaurant),
+                              ],
+                            )
+                          ];
+                        }
+                      },
+                      body: Container(
+                        transform: Matrix4.translationValues(0.0, -8.0, 0.0),
+                        child: _content(context, value.result.restaurant),
+                      ),
+                    ),
                   ),
                 );
                 break;
@@ -119,6 +137,50 @@ class _DetailPageState extends State<DetailPage> {
       ),
     );
   }
+
+  void _addFavorite(Restaurant data) {
+    Favorite favorite = Favorite(
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      city: data.city,
+      address: data.address,
+      pictureId: data.pictureId,
+      rating: data.rating,
+    );
+    dbProvider.addFavorite(favorite);
+  }
+
+  FutureBuilder _favoriteButton(Restaurant restaurant) => FutureBuilder<bool>(
+        future: dbProvider.isFavorited(widget.id),
+        builder: (context, snapshot) {
+          var isFavorited = snapshot.data ?? false;
+
+          if (isFavorited) {
+            return Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: IconButton(
+                icon: Icon(
+                  Icons.favorite,
+                  color: primaryColor,
+                ),
+                onPressed: () => dbProvider.removeFavorite(widget.id),
+              ),
+            );
+          } else {
+            return Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: IconButton(
+                icon: Icon(
+                  Icons.favorite_border,
+                  color: primaryColor,
+                ),
+                onPressed: () => _addFavorite(restaurant),
+              ),
+            );
+          }
+        },
+      );
 
   Padding _content(BuildContext context, Restaurant restaurant) => Padding(
         padding: EdgeInsets.symmetric(

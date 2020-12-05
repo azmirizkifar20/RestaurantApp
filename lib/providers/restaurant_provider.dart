@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/api/result_state.dart';
 import 'package:restaurant_app/data/model/restaurant.dart';
+import 'package:restaurant_app/utils/constants.dart';
 
 class RestaurantProvider extends ChangeNotifier {
   final ApiService apiService;
@@ -27,7 +28,7 @@ class RestaurantProvider extends ChangeNotifier {
       if (data.restaurants.isEmpty) {
         _state = ResultState.NoData;
         notifyListeners();
-        return _message = 'Empty data';
+        return _message = emptyMessage;
       } else {
         _state = ResultState.HasData;
         notifyListeners();
@@ -36,8 +37,7 @@ class RestaurantProvider extends ChangeNotifier {
     } catch (e) {
       _state = ResultState.Error;
       notifyListeners();
-      return _message =
-          'Anda sedang tidak mengakses internet, harap sambungkan koneksi internet di hp anda!';
+      return _message = errorMessage;
     }
   }
 }

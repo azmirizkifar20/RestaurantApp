@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/api/result_state.dart';
+import 'package:restaurant_app/providers/restaurant_detail_provider.dart';
 import 'package:restaurant_app/widget/card_review.dart';
-import 'package:restaurant_app/utils/style/styles.dart';
-import 'package:restaurant_app/utils/providers/restaurant_detail_provider.dart';
+import 'package:restaurant_app/common/styles.dart';
 
 class ReviewPage extends StatefulWidget {
   static const routeName = '/review_page';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
-import 'package:restaurant_app/utils/style/styles.dart';
+import 'package:restaurant_app/common/styles.dart';
 
 class CardMenu extends StatelessWidget {
   final List<Category> listData;

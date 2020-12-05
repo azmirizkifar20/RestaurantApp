@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/api/result_state.dart';
-import 'package:restaurant_app/utils/providers/restaurant_provider.dart';
-import 'package:restaurant_app/utils/style/styles.dart';
+import 'package:restaurant_app/common/styles.dart';
+import 'package:restaurant_app/providers/restaurant_provider.dart';
+import 'package:restaurant_app/utils/background_service.dart';
+import 'package:restaurant_app/utils/notification_helper.dart';
 import 'package:restaurant_app/view/detail_page.dart';
+import 'package:restaurant_app/view/favorite_page.dart';
+import 'package:restaurant_app/view/profile_page.dart';
 import 'package:restaurant_app/view/search_page.dart';
+import 'package:restaurant_app/view/setting_page.dart';
 import 'package:restaurant_app/widget/card_restaurant.dart';
 
 class ListPage extends StatefulWidget {
@@ -16,9 +21,37 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
+  // service
+  final NotificationHelper _notificationHelper = NotificationHelper();
+  final BackgroundService _service = BackgroundService();
+
+  // utilities
+  String avatar = 'assets/ajmi.png';
+  String name = 'Muhamad Azmi Rizkifar';
+  String email = 'm.azmirizkifar20@gmail.com';
+  String banner =
+      'https://t3.ftcdn.net/jpg/03/21/64/02/240_F_321640237_gHHFy6q0CbWCCVU2DUB7WEZbOpayWjl2.jpg';
+  GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    port.listen((_) async => await _service.someTask());
+    _notificationHelper.configureSelectNotificationSubject(
+      DetailPage.routeName,
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    selectNotificationSubject.close();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _drawerKey,
       backgroundColor: toscaColor,
       body: SafeArea(
         child: Column(
@@ -26,37 +59,49 @@ class _ListPageState extends State<ListPage> {
           children: [_header(), _boxItems()],
         ),
       ),
+      drawer: _drawer(),
     );
   }
 
   Container _header() => Container(
-        margin: EdgeInsets.only(top: 12, left: 24, right: 16),
+        margin: EdgeInsets.only(left: 16, right: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
+                GestureDetector(
+                  child: Icon(Icons.dehaze, color: primaryColor),
+                  onTap: () => _drawerKey.currentState.openDrawer(),
+                ),
+                Spacer(),
                 Text(
-                  'Restaurant',
+                  'Dicoding Submissions',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                     color: Colors.white,
                     fontFamily: 'Oxygen',
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 Spacer(),
                 IconButton(
-                  icon: Icon(
-                    Icons.search,
-                    color: Colors.white,
-                    size: 26,
-                  ),
+                  icon: Icon(Icons.search, color: primaryColor),
                   onPressed: () =>
                       Navigator.pushNamed(context, SearchPage.routeName),
                 ),
               ],
             ),
+            SizedBox(height: 12),
+            Text(
+              'Restaurant',
+              style: TextStyle(
+                fontSize: 24,
+                color: Colors.white,
+                fontFamily: 'Oxygen',
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 4),
             Text(
               'Recomended restaurant for you!',
               style: TextStyle(
@@ -136,5 +181,69 @@ class _ListPageState extends State<ListPage> {
               break;
           }
         },
+      );
+
+  Drawer _drawer() => Drawer(
+        child: ListView(
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: Text(name),
+              accountEmail: Text(email),
+              currentAccountPicture: Hero(
+                tag: avatar,
+                child: InkWell(
+                  child: CircleAvatar(
+                    backgroundImage: AssetImage(avatar),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    return Navigator.pushNamed(
+                      context,
+                      ProfilePage.routeName,
+                      arguments: avatar,
+                    );
+                  },
+                ),
+              ),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(banner),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            InkWell(
+              child: ListTile(
+                title: Text('Favorite restaurant'),
+                subtitle: Text('See all your favorite restaurant'),
+                trailing: Icon(Icons.favorite),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                return Navigator.pushNamed(context, FavoritePage.routeName);
+              },
+            ),
+            Divider(),
+            InkWell(
+              child: ListTile(
+                title: Text('Setting'),
+                subtitle: Text('Application settings'),
+                trailing: Icon(Icons.settings),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                return Navigator.pushNamed(context, SettingPage.routeName);
+              },
+            ),
+            Divider(),
+            InkWell(
+              child: ListTile(
+                trailing: Icon(Icons.close),
+                title: Text('Close'),
+              ),
+              onTap: () => Navigator.pop(context),
+            )
+          ],
+        ),
       );
 }
