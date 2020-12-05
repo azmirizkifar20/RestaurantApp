@@ -1,6 +1,6 @@
 # restaurant_app
 
-A new Flutter project.
+![Portofolio Restaurant Apps (flutter)](https://user-images.githubusercontent.com/43155964/101251839-91ebe780-3750-11eb-8d14-f5d8de442649.png)
 
 ## Getting Started
 
